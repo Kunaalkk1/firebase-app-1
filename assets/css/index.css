@@ -1,0 +1,10 @@
+html{
+    scroll-behavior: smooth;
+   }
+   a#download-btn{
+     text-decoration: none; 
+     color: black;
+  }
+  a#download-btn:hover{
+   color:azure;
+  }

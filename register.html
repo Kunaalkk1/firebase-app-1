@@ -74,77 +74,54 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
     import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-    
     const firebaseConfig = callFirebase()
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const db = getFirestore();
     import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
+    
 // Calling the basic attributes of the webpage
 document.getElementById("download-button").addEventListener("mouseover",ChangeToLight);
 document.getElementById("download-button").addEventListener("mouseout",ChangeToDark);
 document.getElementById("reset-button").addEventListener("click", resetForm);
-document.getElementById("download-button").addEventListener("click", authenticateToFirebase);
+document.getElementById("download-button").addEventListener("click", clickEvent);
 
-//This function will be called on clicking the Download button
-async function authenticateToFirebase(){
-    var name=document.getElementById("name").value;
-    var age=document.getElementById("age").value;
-    var email=document.getElementById("email").value;
-    var mobilenumber=document.getElementById("mobile-number").value;
-    var university=document.getElementById("university").value;
-    var ip=document.getElementById("my-ip").textContent;
-    var check=document.getElementById("terms-of-use").checked;
-    if (age.length==0){
-      age="18+"; //As per the terms of use, age should be 18 and above, by default.
-    if(name.length==0 || email.length==0 || mobilenumber.length==0){
-        window.alert("Required Fields Missing!");
-    } else{
-    if(validateEmail(email)==false || validateMobileNumber(mobilenumber)==false){
-        window.alert("Invalid Email or mobile number!");
-    }
+async function clickEvent(){
+  var name=document.getElementById("name").value;
+  var age=document.getElementById("age").value;
+  if (age.length==0){
+    age="18+"; //As per the terms of use, age should be 18 and above, by default.
+  var email=document.getElementById("email").value;
+  var mobilenumber=document.getElementById("mobile-number").value;
+  var university=document.getElementById("university").value;
+  var ip=document.getElementById("my-ip").textContent;
+  var check=document.getElementById("terms-of-use").checked;
+  if (name.length!=0 && validateEmail(email) && validateMobileNumber(mobilenumber) && check){
+    try {
+      const docRef = await addDoc(collection(db, "userdata"), {
+      "name": name,
+      "age": age,
+      "email": email,
+      "mobileNumber": mobilenumber,
+      "university":university,
+      "ipAddress":ip
+      });
+      document.getElementById("docref").innerHTML=docRef;
+      window.location.replace("download.html");
+      } catch (e) {
+      console.error("Error adding document: ", e);
+      if(window.confirm("An error occured! Retry?")){
+        window.location.reload();
+      }
       else{
-        if(check==false){
-          alert("Please accept the terms and conditions before you proceed!")
-        }
-        else{
-          // Print data logs to console
-          console.log("Name: ", name);
-          console.log("Age: ", age);
-          console.log("Email: ", email);
-          console.log("Mobile Number: ", mobilenumber);
-          console.log("University: ", university);
-          console.log("Public IP Address: ", ip);
-          console.log("Checkbox: ", check);
-
-          // Insert data into Firestore Database here
-          try {
-            const docRef = await addDoc(collection(db, "userdata"), {
-            "name": name,
-            "age": age,
-            "email": email,
-            "mobileNumber": mobilenumber,
-            "university":university,
-            "ipAddress":ip
-            });
-            document.getElementById("docref").innerHTML=docRef;
-            window.location.replace("download.html");
-            } catch (e) {
-            console.error("Error adding document: ", e);
-            if(window.confirm("An error occured! Retry?")){
-              window.location.reload();
-            }
-            else{
-              window.location.replace("index.html");
-              }
-            }
-          }
+        window.location.replace("index.html");
         }
       }
+    } else {
+      alert("error!")
     }
   }
-
+}
 </script>
 </body>
 </html>

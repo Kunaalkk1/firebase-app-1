@@ -25,7 +25,8 @@
             <div class="col-sm-12" style="padding-top: 10px;">
                 <div style="text-align: center;"><h6><b>Kindly register to download the mobile app</b></h6></div><br>
                 <span style="font-size:12px;"><i>* Required field</i></span>
-                <span id="my-ip" hidden></span>   
+                <span id="my-ip" hidden></span>
+                <span id="docref" hidden></span>   
             </div>
             <div class="col-sm-12" style="padding-top: 10px;">
                 <form id="registration-form">
@@ -78,30 +79,72 @@
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const db = getFirestore();
+    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"; 
-    
-    async function sendToDatabase (uname,age,email,mobilenumber,university,ip){
-    try {
-        const docRef = await addDoc(collection(db, "userdata"), {
-        "name": uname,
-        "age": age,
-        "email": email,
-        "mobileNumber": mobilenumber,
-        "university":university,
-        "ipAddress":ip
-        });
-        window.location.replace("download.html");
-        } catch (e) {
-        console.error("Error adding document: ", e);
-        if(window.confirm("An error occured! Retry?")){
-          window.location.reload();
+// Calling the basic attributes of the webpage
+document.getElementById("download-button").addEventListener("mouseover",ChangeToLight);
+document.getElementById("download-button").addEventListener("mouseout",ChangeToDark);
+document.getElementById("reset-button").addEventListener("click", resetForm);
+document.getElementById("download-button").addEventListener("click", authenticateToFirebase);
+
+//This function will be called on clicking the Download button
+async function authenticateToFirebase(){
+    var name=document.getElementById("name").value;
+    var age=document.getElementById("age").value;
+    var email=document.getElementById("email").value;
+    var mobilenumber=document.getElementById("mobile-number").value;
+    var university=document.getElementById("university").value;
+    var ip=document.getElementById("my-ip").textContent;
+    var check=document.getElementById("terms-of-use").checked;
+    if (age.length==0){
+      age="18+"; //As per the terms of use, age should be 18 and above, by default.
+    if(name.length==0 || email.length==0 || mobilenumber.length==0){
+        window.alert("Required Fields Missing!");
+    } else{
+    if(validateEmail(email)==false || validateMobileNumber(mobilenumber)==false){
+        window.alert("Invalid Email or mobile number!");
+    }
+      else{
+        if(check==false){
+          alert("Please accept the terms and conditions before you proceed!")
         }
         else{
-          window.location.replace("index.html");
+          // Print data logs to console
+          console.log("Name: ", name);
+          console.log("Age: ", age);
+          console.log("Email: ", email);
+          console.log("Mobile Number: ", mobilenumber);
+          console.log("University: ", university);
+          console.log("Public IP Address: ", ip);
+          console.log("Checkbox: ", check);
+
+          // Insert data into Firestore Database here
+          try {
+            const docRef = await addDoc(collection(db, "userdata"), {
+            "name": name,
+            "age": age,
+            "email": email,
+            "mobileNumber": mobilenumber,
+            "university":university,
+            "ipAddress":ip
+            });
+            document.getElementById("docref").innerHTML=docRef;
+            window.location.replace("download.html");
+            } catch (e) {
+            console.error("Error adding document: ", e);
+            if(window.confirm("An error occured! Retry?")){
+              window.location.reload();
+            }
+            else{
+              window.location.replace("index.html");
+              }
+            }
           }
         }
       }
+    }
+  }
+
 </script>
 </body>
 </html>

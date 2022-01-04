@@ -34,25 +34,29 @@ document.onkeydown = function(e) {
 }
 
 function validateEmail(emailID){
+  if (email.length==0){
+    return false
+  } else {
   var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return re.test(emailID);
+  }
 }
 
 function validateMobileNumber(number){
-if(number.length==10){
-  var returnValue;
-for(let i=0;i<=9;i++){
-  if((number[i].match(/^\d+/))){
+  if(number.length==10){
+    var returnValue;
+  for(let i=0;i<=9;i++){
+    if((number[i].match(/^\d+/))){
       returnValue = true;
-    }
-  else{
+      }
+    else{
       returnValue = false;
-      break;
+      break;      
+      }
+    }
+    return returnValue;
+  }
+  else{
+    return false;
     }
   }
-  return returnValue;
-}
-else{
-  return false;
-  }
-}
